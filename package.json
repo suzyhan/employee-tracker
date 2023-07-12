@@ -18,6 +18,10 @@
   },
   "homepage": "https://github.com/suzyhan/employee-tracker#readme",
   "dependencies": {
-    "inquirer": "^8.2.4"
+    "2": "^3.0.0",
+    "dotenv": "^16.3.1",
+    "inquirer": "^8.2.4",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.5.1"
   }
 }

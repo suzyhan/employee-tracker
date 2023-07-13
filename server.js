@@ -45,36 +45,71 @@ inquirer
         ]
     })
     .then((answer) => {
-        if (answer === 'View All Departments') {
-            viewAllDepartments();
-        }
-        if (answer === 'View All Roles') {
-            viewAllRoles();
-        }
-        if (answer === 'View All Employees') {
-            viewAllEmployees();
-        }
-        if (answer === 'Add Department') {
-            addDepartment();
-        }
-        if (answer === 'Add Role') {
-            addRole();
-        }
-        if (answer === 'Add Employee') {
-            addEmployee();
-        }
-        if (answer === 'Update Employee Role') {
-            updateEmployeeRole();
-        }
-        if (answer === 'Exit') {
-            connection.end();
-            console.log(`Bye`);
+        switch (answer.action) {
+            case 'View All Departments': viewAllDepartments();
+            break;
+            case 'View All Roles': viewAllRoles();
+            break;
+            case 'View All Employees': viewAllEmployees();
+            break;
+            case 'Add Department': addDepartment();
+            break;
+            case 'Add Role': addRole();
+            break;
+            case 'Add Employee': addEmployee();
+            break;
+            case 'Update Employee Role': updateEmployeeRole();
+            break;
+            case 'Exit': connection.end();
+            console.log('Bye');
+            break;
+            
         }
     });
 };
 
+// Create function to view all departments
 function viewAllDepartments() {
-    const query = 'SELECT * FROM department';
+    const query = `SELECT * FROM department`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+        prompt();
+    })
+} 
+
+// Create function to view all roles
+function viewAllRoles() {
+    const query = `SELECT 
+        role.id, 
+        role.title, 
+        role.salary, 
+        role.department_id, 
+        department.name 
+    FROM role 
+    LEFT JOIN department on role.department_id = department.id`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+        prompt();
+    })
+} 
+
+// Create function to view all employees
+function viewAllEmployees() {
+    const query = `SELECT 
+        employee.id, 
+        employee.first_name, 
+        employee.last_name, 
+        role.title, 
+        role.salary, 
+        department.name, 
+        employee.manager_id, 
+    CONCAT(manager.first_name, " ", manager.last_name) AS manager_name 
+    FROM employee 
+    LEFT JOIN role on employee.role_id = role.id 
+    LEFT JOIN department on role.department_id = department.id 
+    LEFT JOIN employee manager on employee.manager_id = manager.id`;
     connection.query(query, (err, res) => {
         if (err) throw err;
         console.log(res);

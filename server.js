@@ -28,7 +28,7 @@ connection.connect((err) => {
 
 // Create a function to prompt user
 function prompt() {
-inquirer
+    inquirer
     .prompt({
         type:'list',
         name:'action',
@@ -73,7 +73,7 @@ function viewAllDepartments() {
     const query = `SELECT * FROM department`;
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.log(res);
+        console.table(res);
         prompt();
     })
 } 
@@ -90,7 +90,7 @@ function viewAllRoles() {
     LEFT JOIN department on role.department_id = department.id`;
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.log(res);
+        console.table(res);
         prompt();
     })
 } 
@@ -112,7 +112,74 @@ function viewAllEmployees() {
     LEFT JOIN employee manager on employee.manager_id = manager.id`;
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.log(res);
+        console.table(res);
         prompt();
     })
 } 
+
+// Create function to add department
+function addDepartment() {
+    inquirer
+    .prompt({
+        type: 'input',
+        name: 'name',
+        message: 'Enter New Department Name:'
+    })
+    .then((answer) => {
+        console.log(answer.name);
+        const query = `INSERT INTO department (name) VALUES ("${answer.name}")`;
+        connection.query(query, (err, res) => {
+            if (err) throw err;
+            console.log(`Department ${answer.name} has been added to the database.`)
+            prompt();
+            console.log(answer.name);
+        });
+    });
+}
+
+// Create function to add role
+function addRole() {
+    const query = `SELECT * FROM department`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'title',
+                message: 'Enter the title of the new role:',
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'Enter the salary of the new role:',
+            },
+            {
+                type: 'list',
+                name: 'department',
+                message: 'Select the department for the new role:',
+                choices: res.map(
+                    (department) => department.name
+                ),
+            }
+        ])
+        .then((answers) => {
+            const department = res.find(
+                (department) => department.name === answers.department
+            );
+            const query = `INSERT INTO role SET ?`;
+            connection.query(
+                query, {
+                    title: answers.title,
+                    salary: answers.salary,
+                    department_id: department,
+                },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`The role ${answers.title} with salary ${answers.salary} to the ${answers.department} department has been added to the database.`);
+                prompt();
+                }
+            );
+        });
+    });
+}
